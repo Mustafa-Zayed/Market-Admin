@@ -1,0 +1,61 @@
+<div class="box mt-5">
+  <div class="my-2 w-25">
+    <app-select label="Categories" [iterator] = "categories" (selectionChanged)="getByCategory($event)"></app-select>
+  </div>
+
+  <div class="row" *ngIf="!loading">
+    <div class="col-md-3 col-sm-12" *ngFor="let prod of products">
+      <app-product [prod] = "prod" (onAddToCart)="addToCart($event);"></app-product>
+    </div>
+  </div>
+
+  <div class="text-center w-100" *ngIf="loading">
+    <app-spinner></app-spinner>
+  </div>
+</div>
+
+<!-- Modal -->
+<div
+  class="modal fade"
+  id="modalId"
+  #modalId
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="modalTitleId"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalTitleId">
+          Product Added To Cart Successfully
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="container-fluid">
+          <p><strong>Product Name:</strong> {{ product?.title }}</p>
+          <p><strong>Quantity:</strong> {{ quantity }}</p>
+          <p><strong>Price:</strong> {{ product?.price }}</p>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          data-bs-dismiss="modal"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+

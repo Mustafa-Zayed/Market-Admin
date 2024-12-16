@@ -1,0 +1,19 @@
+<div class="item">
+  <img [src]="prod.image" routerLink="/product/{{prod.id}}" style="cursor: pointer" 
+    title="Click to see details" alt="" />
+  <div class="body">
+    <h4>{{ prod.title }}</h4>
+    <p>{{ prod.description }}</p>
+  </div>
+  <div class="px-3 mb-2 d-flex justify-content-between align-items-center">
+    <button #addToCart class="btn btn-success" *ngIf="!addBtnFlag" (click)="addBtnFlag = true">
+      Add To Cart
+    </button>
+    <div class="d-flex w-50" *ngIf="addBtnFlag">
+      <input type="number" class="form-control" [(ngModel)]="prodQuantity">
+      <button class="btn btn-danger" (click)="addToCartClick(prod)">Add</button>
+    </div>
+    <span>{{ prod.price | currency : "EGP" }}</span>
+  </div>
+  <span class="alert alert-danger" *ngIf="prodQuantity < 1">Quantity must be greater than 0</span>
+</div>

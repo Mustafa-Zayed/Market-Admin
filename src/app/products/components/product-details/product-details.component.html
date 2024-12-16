@@ -1,0 +1,25 @@
+<div class="box">
+  <div class="row" *ngIf="!loading">
+    <div class="col-md-5 col-sm-12">
+      <img [src]="product.image" alt="null" />
+    </div>
+    <div class="col-md-7 col-sm-12">
+      <div class="info">
+        <ul class="list-unstyled">
+          <li><strong>Title :</strong>{{ product.title }}</li>
+          <li><strong>Category :</strong>{{ product.category }}</li>
+          <li><strong>Description :</strong>{{ product.description }}</li>
+          <li><strong>Rate :</strong>{{ product.rating.rate }}</li>
+          <li><strong>Count :</strong>{{ product.rating.count }}</li>
+          <li>
+            <strong>Price :</strong>{{ product.price | currency : "EGP" }}
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="text-center w-100" *ngIf="loading">
+    <app-spinner></app-spinner>
+  </div>
+</div>
