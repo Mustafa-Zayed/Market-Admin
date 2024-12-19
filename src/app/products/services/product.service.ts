@@ -20,18 +20,7 @@ export class ProductService {
     return this.http.get<IProduct>(`${environment.API_URL}/products/${id}`);
   }
 
-  addToCart(event: { product: IProduct; quantity: number }) {
-    if (event.quantity < 1) return;
-    
-    let item = this.cartItems.find(
-      (item: { product: IProduct; quantity: number }) =>
-        item.product.id === event.product.id
-    );
-
-    if (item) item.quantity += event.quantity;
-    else this.cartItems.push(event);
-
-    localStorage.setItem('cartItems', JSON.stringify(this.cartItems));
-    console.log(this.cartItems);
+  addNewProduct(product: IProduct) : Observable<IProduct>{
+    return this.http.post<IProduct>(`${environment.API_URL}/products`, product);
   }
 }

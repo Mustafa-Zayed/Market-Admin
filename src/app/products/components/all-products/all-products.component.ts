@@ -3,6 +3,7 @@ import { ProductService } from '../../services/product.service';
 import { Observer, Subscription } from 'rxjs';
 import { CategoryService } from '../../services/category.service';
 import { IProduct } from '../../models/iproduct';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-all-products',
@@ -15,6 +16,8 @@ export class AllProductsComponent implements OnInit, OnDestroy {
   subscriptions: Subscription[] = [];
   private productObserver: Observer<Object>;
   loading: boolean = false;
+  addProductForm: FormGroup;
+  base64: any="";
 
   /**
    * When { static: false } is used (default in most cases), Angular initializes the @ViewChild 
@@ -43,6 +46,13 @@ export class AllProductsComponent implements OnInit, OnDestroy {
       },
       complete: () => console.log('Completed!'),
     };
+    this.addProductForm = new FormGroup({
+      title: new FormControl('', Validators.required),
+      description: new FormControl('', Validators.required),
+      price: new FormControl('', Validators.required),
+      category: new FormControl('', Validators.required),
+      image: new FormControl(''),
+    })
   }
 
   ngOnInit(): void {
@@ -67,17 +77,6 @@ export class AllProductsComponent implements OnInit, OnDestroy {
     this.subscriptions.push(sub);
   }
 
-  // getByCategory(category: string) {
-  //   this.loading = true;
-  //   if (category === 'all') {
-  //     this.getAllProducts();
-  //     return;
-  //   }
-  //   let sub = this.categoryService.getByCategory(category).subscribe(this.productObserver);
-
-  //   this.subscriptions.push(sub);
-  // }
-
   getByCategory(event: any) {
     this.loading = true;
     let category = event.target.value;
@@ -91,18 +90,40 @@ export class AllProductsComponent implements OnInit, OnDestroy {
     this.subscriptions.push(sub);
   }
 
-  addToCart(event: { product: IProduct, quantity: number }) {
-    this.productService.addToCart(event);
-    this.showAddedToCartModal(event);
+  getSelectedCategory(event: any) {
+    let category = event.target.value;
+    this.addProductForm.get('category')?.setValue(category);
   }
 
-  private showAddedToCartModal(event: { product: IProduct, quantity: number }) {
-    this.product = event.product;
-    this.quantity = event.quantity;
-
-    const modal = new (window as any).bootstrap.Modal(this.modalElement.nativeElement);
-    modal.show();
+  getImagePath(event: any) {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      this.base64 = reader.result;
+      console.log(this.base64)
+      this.addProductForm.get('image')?.setValue('');
+      this.addProductForm.get('image')?.setValue(this.base64);
+    };
   }
+
+  addProduct() {
+    let product = this.addProductForm.value;
+    console.log(product);
+
+    let sub = this.productService.addNewProduct(product).subscribe((data)=>{
+      console.log(data);
+    })
+    this.subscriptions.push(sub);
+  }
+  
+  // private showAddedToCartModal(event: { product: IProduct, quantity: number }) {
+  //   this.product = event.product;
+  //   this.quantity = event.quantity;
+
+  //   const modal = new (window as any).bootstrap.Modal(this.modalElement.nativeElement);
+  //   modal.show();
+  // }
   
   ngOnDestroy(): void {
     this.subscriptions.forEach((sub) => sub.unsubscribe());
