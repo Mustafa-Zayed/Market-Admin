@@ -3,7 +3,8 @@
     <app-select label="Categories" [iterator] = "categories" (selectionChanged)="getByCategory($event)"></app-select>
   </div>
 
-  <button class="btn btn-success my-2" data-bs-toggle="modal" data-bs-target="#modalId">
+  <button class="btn btn-success my-2" data-bs-toggle="modal" data-bs-target="#modalId" 
+  (click)="addForm()">
     Add New Product
   </button>
 
@@ -16,6 +17,7 @@
                 <th>Name</th>
                 <th style="width: 25%;">Category</th>
                 <th>Price</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -24,6 +26,10 @@
                 <td>{{product.title}}</td>
                 <td>{{product.category}}</td>
                 <td>{{product.price | currency : "EGP"}}</td>
+                <td>
+                  <button class="btn btn-danger mx-2" data-bs-toggle="modal" 
+                  data-bs-target="#modalId" (click)="updateForm(product)">Update</button>
+                </td>
             </tr>
         </tbody> 
       </table>
@@ -36,101 +42,48 @@
 </div>
 
 <!-- Modal -->
-<div
-  class="modal fade"
-  id="modalId1"
-  #modalId
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="modalTitleId"
-  aria-hidden="true"
->
-  <div class="modal-dialog modal-dialog-centered" style="max-width: 900px!important" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="modalTitleId">
-          Add New Product
-        </h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        ></button>
-      </div>
-
-      <div class="modal-body">
-        <div class="container-fluid">
-          <form [formGroup]="addProductForm" (ngSubmit)="addProduct()">
-            <input type="text" class="form-control" placeholder="title" formControlName="title">
-            <input type="text" class="form-control" placeholder="price" formControlName="price">
-            <select formControlName="category">
-              <option value="all" disabled>All</option>
-              <option *ngFor="let category of categories" [value]="category"> {{category}} </option>
-            </select>
-            <textarea type="text" formControlName="description" class="form-control" placeholder="type here"></textarea>
-            <input type="file" class="form-control" placeholder="image" formControlName="image">
-            <button type="submit" class="btn btn-success " data-bs-dismiss="modal">
-              Add</button>
-          </form>
-        </div>
-      </div>
-
-      <!-- <div class="modal-footer">
-        <button
-          type="button"
-          class="btn btn-secondary"
-          data-bs-dismiss="modal"
-        >
-          Close
-        </button>
-      </div> -->
-    </div>
-  </div>
-</div>
-
 <div class="modal fade " id="modalId" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" style="max-width: 900px!important">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Add Product</h5>
+        <h5 class="modal-title" id="exampleModalLabel">{{updateFlag ? 'Update Product' : 'Add Product'}}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-          
         </button>
       </div>
       <div class="modal-body">
   
           <form [formGroup]="addProductForm" (ngSubmit)="addProduct()">
-              <div class="row">
-                  <div class="col-md-4 col-sm-12">
-                      <label for="">Title</label>
-                      <input type="text" formControlName="title" class="form-control" placeholder="title">
+            <div class="row">
+                <div class="col-md-4 col-sm-12">
+                    <label for="">Title</label>
+                    <input type="text" formControlName="title" class="form-control" placeholder="title">
+                </div>
+                <div class="col-md-4 col-sm-12">
+                    <label for="">Price</label>
+                    <input type="number"  formControlName="price" class="form-control" placeholder="price">
+                </div>
+                <div class="col-md-4 col-sm-12">
+                    <app-select [iterator]="categories" label="Categories" [all]="false"
+                    [selectedOption]="selectedOption"
+                    (selectionChanged)="getSelectedCategory($event)"></app-select>
+                    <!-- <select formControlName="category">
+                      <option value="all" selected>All</option>
+                      <option *ngFor="let category of categories" [value]="category"> {{category}} </option>
+                    </select> -->
                   </div>
-                  <div class="col-md-4 col-sm-12">
-                      <label for="">Price</label>
-                      <input type="number"  formControlName="price" class="form-control" placeholder="price">
-                  </div>
-                  <div class="col-md-4 col-sm-12">
-                      <app-select [iterator]="categories" label="Categories"
-                      (selectionChanged)="getSelectedCategory($event)"></app-select>
-                      <!-- <select formControlName="category">
-                        <option value="all" selected>All</option>
-                        <option *ngFor="let category of categories" [value]="category"> {{category}} </option>
-                      </select> -->
-                    </div>
-                  <div class="col-md-4 col-sm-12">
-                      <label for="image">Image</label>
-                      <img [src]="base64" alt="">
-                      <input type="file" accept="image/*" class="form-control" (change)="getImagePath($event)">
-                  </div>
-                  <div class="col-md-8 col-sm-12">
-                      <label for="image">Description</label>
-                      <textarea class="form-control" formControlName="description" placeholder="type here .. "></textarea>
-                  </div>
-              </div>
-              <div class="d-flex justify-content-end mt-3">
-                  <button type="submit" class="btn btn-success" [disabled]="addProductForm.invalid">Add Product</button>
-              </div>
+                <div class="col-md-4 col-sm-12">
+                    <label for="image">Image</label>
+                    <img [src]="base64" alt="">
+                    <input type="file" accept="image/*" class="form-control" (change)="getImagePath($event)">
+                </div>
+                <div class="col-md-8 col-sm-12">
+                    <label for="image">Description</label>
+                    <textarea class="form-control" formControlName="description" placeholder="type here .. "></textarea>
+                </div>
+            </div>
+            <div class="d-flex justify-content-end mt-3">
+                <button type="submit" class="btn btn-success" [disabled]="addProductForm.invalid">{{updateFlag? 'Update Product' : 'Add Product'}}</button>
+            </div>
           </form>
       </div>
     </div>

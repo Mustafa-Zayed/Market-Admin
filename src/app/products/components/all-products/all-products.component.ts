@@ -18,19 +18,8 @@ export class AllProductsComponent implements OnInit, OnDestroy {
   loading: boolean = false;
   addProductForm: FormGroup;
   base64: any="";
-
-  /**
-   * When { static: false } is used (default in most cases), Angular initializes the @ViewChild 
-   * reference after the view is rendered.
-   * This means you don’t need to explicitly implement AfterViewInit unless you want to interact
-   * with the @ViewChild property as soon as it is initialized.
-   * Since the modal is only shown when showModal() is called (a user action or another event), 
-   * the modalElement is already initialized by the time you access 
-   */
-  @ViewChild('modalId') modalElement!: ElementRef;
-  // Properties to hold modal data
-  product: IProduct = {} as IProduct;
-  quantity: number = 0;
+  selectedOption: string = '';
+  updateFlag: boolean = false;
 
   constructor(private productService: ProductService, private categoryService:CategoryService) {
     this.productObserver = {
@@ -107,6 +96,13 @@ export class AllProductsComponent implements OnInit, OnDestroy {
     };
   }
 
+  addForm() {
+    this.updateFlag = false;
+    this.addProductForm.reset();
+    this.base64 = '';
+    this.selectedOption = '';
+  }
+
   addProduct() {
     let product = this.addProductForm.value;
     console.log(product);
@@ -116,14 +112,28 @@ export class AllProductsComponent implements OnInit, OnDestroy {
     })
     this.subscriptions.push(sub);
   }
-  
-  // private showAddedToCartModal(event: { product: IProduct, quantity: number }) {
-  //   this.product = event.product;
-  //   this.quantity = event.quantity;
 
-  //   const modal = new (window as any).bootstrap.Modal(this.modalElement.nativeElement);
-  //   modal.show();
-  // }
+  updateForm(product: IProduct) {
+    this.updateFlag = true;
+
+    this.addProductForm.patchValue({
+      title: product.title,
+      description: product.description,
+      price: product.price,
+    });
+
+    // this.addProductForm.get('category')?.setValue(product.category); // not working as it'sn't an input
+    this.selectedOption = product.category;
+
+    this.base64 = product.image; // as the src attribute binds to base64
+  }
+
+  updateProduct(productId: number, product: IProduct) {
+    let sub = this.productService.updateProduct(productId, product).subscribe((data)=>{
+      console.log(data);
+    })
+    this.subscriptions.push(sub);
+  }
   
   ngOnDestroy(): void {
     this.subscriptions.forEach((sub) => sub.unsubscribe());

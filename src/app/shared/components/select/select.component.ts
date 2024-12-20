@@ -12,6 +12,12 @@ export class SelectComponent implements OnInit {
 
   @Input()
   iterator:any[] = [];
+  
+  @Input()
+  all:boolean = true;
+  
+  @Input()
+  selectedOption:any; // to set the selected value
 
   @Output()
   selectionChanged:EventEmitter<any> = new EventEmitter<any>();
